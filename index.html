@@ -63,6 +63,11 @@ button.btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 
 .sortbar{margin:10px 0 14px;display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:12.5px;color:var(--soft)}
 .sortbar select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:var(--surface);color:var(--ink)}
+.teamfilter{justify-content:space-between;align-items:flex-end;flex-wrap:wrap}
+.teamfilter label{display:flex;align-items:center;gap:8px}
+.teamfilter select{min-width:180px}
+.empty{padding:18px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--soft);font-size:13px}
+
 
 /* group grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;margin-top:8px}
@@ -157,6 +162,7 @@ tr.adv .rk{color:var(--green)}
   <nav class="tabs" role="tablist">
     <button class="tab" data-view="groups" a-sel="1" role="tab">順位表</button>
     <button class="tab" data-view="today" role="tab">今日の試合</button>
+    <button class="tab" data-view="country" role="tab">国別検索</button>
     <button class="tab" data-view="matches" role="tab">試合</button>
     <button class="tab" data-view="ko" role="tab">決勝トーナメント</button>
   </nav>
@@ -165,6 +171,7 @@ tr.adv .rk{color:var(--green)}
 
   <section class="view on" id="v-groups"></section>
   <section class="view" id="v-today"><div id="todayList"></div></section>
+  <section class="view" id="v-country"><div class="sortbar teamfilter"><label>国 <select id="teamFilter"><option value="">国を選択</option></select></label><label>表示順 <select id="countrySort"><option value="asc">古い順</option><option value="desc">新しい順</option><option value="finished">終了済み</option></select></label></div><div id="countryList"></div></section>
   <section class="view" id="v-matches"><div class="sortbar">表示順 <select id="matchSort"><option value="asc">古い順</option><option value="desc">新しい順</option><option value="finished">終了済み</option></select></div><div id="matchList"></div></section>
   <section class="view" id="v-ko"><div class="sortbar">表示順 <select id="koSort"><option value="asc">古い順</option><option value="desc">新しい順</option><option value="finished">終了済み</option></select></div><div id="koList"></div></section>
 
@@ -497,6 +504,102 @@ function renderToday(){
   box.appendChild(sec);
 }
 
+
+function canonicalTeamName(n){
+  return String(n||'')
+    .replace(/&amp;/g,'&')
+    .replace(/\s*&\s*/g,' and ')
+    .replace(/^USA$/,'United States')
+    .replace(/^United States of America$/,'United States')
+    .replace(/^Korea Republic$/,'South Korea')
+    .replace(/^Czech Republic$/,'Czechia')
+    .replace(/^Türkiye$/,'Turkey')
+    .replace(/^Turkiye$/,'Turkey')
+    .replace(/^Côte d'Ivoire$/,"Ivory Coast")
+    .replace(/^Cote d'Ivoire$/,"Ivory Coast")
+    .replace(/^Curacao$/,'Curaçao')
+    .replace(/^Cabo Verde$/,'Cape Verde')
+    .replace(/^Congo DR$/,'DR Congo')
+    .replace(/^Democratic Republic of the Congo$/,'DR Congo')
+    .trim();
+}
+function sameTeam(a,b){
+  if(!a || !b) return false;
+  return canonicalTeamName(a)===canonicalTeamName(b) || teamJa(a)===teamJa(b);
+}
+function getPlayableTeams(){
+  const map=new Map();
+  DATA.forEach(m=>{
+    [m.team1,m.team2].forEach(t=>{
+      if(!t || isPlaceholder(t)) return;
+      const key=canonicalTeamName(t);
+      if(!map.has(key)) map.set(key,t);
+    });
+  });
+  return [...map.values()].sort((a,b)=>teamJa(a).localeCompare(teamJa(b),'ja'));
+}
+function populateTeamFilter(){
+  const sel=document.getElementById('teamFilter');
+  if(!sel) return;
+  const before=sel.value;
+  const teams=getPlayableTeams();
+  sel.innerHTML='<option value="">国を選択</option>';
+  teams.forEach(t=>{
+    const opt=document.createElement('option');
+    opt.value=t;
+    opt.textContent=teamLabel(t);
+    sel.appendChild(opt);
+  });
+  if(before && teams.some(t=>sameTeam(t,before))){
+    sel.value=teams.find(t=>sameTeam(t,before)) || before;
+  }else{
+    const japan=teams.find(t=>sameTeam(t,'Japan'));
+    if(japan) sel.value=japan;
+  }
+}
+function selectedCountryMatches(){
+  const sel=document.getElementById('teamFilter');
+  if(!sel || !sel.value) return [];
+  const team=sel.value;
+  const mode=document.getElementById('countrySort') ? document.getElementById('countrySort').value : 'asc';
+  return DATA.filter(m=>sameTeam(m.team1,team) || sameTeam(m.team2,team))
+    .filter(m=>mode==='finished' ? !!ft(m) : true);
+}
+function renderCountry(){
+  const box=document.getElementById('countryList');
+  if(!box) return;
+  box.innerHTML='';
+  const sel=document.getElementById('teamFilter');
+  if(!sel || !sel.value){
+    box.appendChild(el('div','empty','国を選択してください。'));
+    return;
+  }
+  const mode=document.getElementById('countrySort') ? document.getElementById('countrySort').value : 'asc';
+  const desc = mode==='desc' || mode==='finished';
+  const ms=selectedCountryMatches().sort((a,b)=> desc ? (koDate(b)||0)-(koDate(a)||0) : (koDate(a)||0)-(koDate(b)||0));
+  const fin=ms.filter(m=>ft(m)).length;
+  const title=el('div','dayhd');
+  title.appendChild(el('span',null,`${teamLabel(sel.value)} の試合`));
+  title.appendChild(el('small',null,`${ms.length}試合 ・ 確定 ${fin}`));
+  box.appendChild(title);
+  if(!ms.length){
+    box.appendChild(el('div','empty','該当する試合はありません。'));
+    return;
+  }
+  const byDay={};
+  ms.forEach(m=>{const k=jstDayKey(koDate(m)); (byDay[k]=byDay[k]||[]).push(m);});
+  Object.keys(byDay).sort((a,b)=> desc ? b.localeCompare(a) : a.localeCompare(b)).forEach(k=>{
+    const dayMatches=byDay[k].sort((a,b)=> desc ? (koDate(b)||0)-(koDate(a)||0) : (koDate(a)||0)-(koDate(b)||0));
+    const sec=el('div','daygroup');
+    const d0=koDate(dayMatches[0]);
+    const hd=el('div','dayhd'); hd.appendChild(Object.assign(el('span'),{textContent:d0?fmtJ.format(d0):k}));
+    hd.appendChild(Object.assign(el('small'),{textContent:`${dayMatches.length}試合`}));
+    sec.appendChild(hd);
+    const list=el('div','mlist'); dayMatches.forEach(m=>list.appendChild(matchRow(m))); sec.appendChild(list);
+    box.appendChild(sec);
+  });
+}
+
 function renderMatches(){
   const box=$('#matchList'); box.innerHTML='';
   const mode=$('#matchSort').value;
@@ -541,7 +644,7 @@ function jpRound(r){return {"Round of 32":"ラウンド32","Round of 16":"ラウ
 
 function escapeHtml(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-function renderAll(){renderGroups();renderToday();renderMatches();renderKO();}
+function renderAll(){renderGroups();renderToday();populateTeamFilter();renderCountry();renderMatches();renderKO();}
 
 /* ---- fetch ---- */
 async function load(){
@@ -577,6 +680,8 @@ document.querySelectorAll('.tab').forEach(t=>{
 $('#refresh').addEventListener('click',load);
 $('#src').addEventListener('change',load);
 $('#matchSort').addEventListener('change',renderMatches);
+$('#countrySort').addEventListener('change',renderCountry);
+$('#teamFilter').addEventListener('change',renderCountry);
 $('#koSort').addEventListener('change',renderKO);
 renderAll(); load();
 </script>
