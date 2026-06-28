@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2026 FIFAワールドカップ — 結果トラッカー</title>
 <style>
-  body{margin:0;display:grid;min-height:100vh;place-items:center;background:#FAF9F6;color:#15181C;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif}
-  .error{display:none;max-width:520px;margin:24px;padding:18px 20px;border:1px solid #E7E6E1;border-radius:11px;background:#fff;line-height:1.6}
+body{margin:0;display:grid;min-height:100vh;place-items:center;background:#FAF9F6;color:#15181C;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif}
+.error{display:none;max-width:520px;margin:24px;padding:18px 20px;border:1px solid #E7E6E1;border-radius:11px;background:#fff;line-height:1.6}
 </style>
 </head>
 <body>
@@ -14,79 +14,85 @@
 <script>
 (async()=>{
   const SOURCE_URL='https://raw.githubusercontent.com/ranko330-star/worldcup2026/1ed2544aa7927f5d310afe954583399ea92fda01/index.html';
-  const FIFA_RANK = {
-    "Argentina":1,
-    "Spain":2,
-    "France":3,
-    "England":4,
-    "Portugal":5,
-    "Brazil":6,
-    "Morocco":7,
-    "Netherlands":8,
-    "Belgium":9,
-    "Germany":10,
-    "Croatia":11,
-    "Colombia":13,
-    "Mexico":14,
-    "Senegal":15,
-    "Uruguay":16,
-    "USA":17,
-    "United States":17,
-    "United States of America":17,
-    "Japan":18,
-    "Switzerland":19,
-    "Iran":20,
-    "IR Iran":20,
-    "Turkey":22,
-    "Türkiye":22,
-    "Turkiye":22,
-    "Ecuador":23,
-    "Austria":24,
-    "South Korea":25,
-    "Korea Republic":25,
-    "Australia":27,
-    "Algeria":28,
-    "Egypt":29,
-    "Canada":30,
-    "Norway":31,
-    "Ivory Coast":33,
-    "Côte d'Ivoire":33,
-    "Cote d'Ivoire":33,
-    "Panama":34,
-    "Sweden":38,
-    "Czechia":40,
-    "Czech Republic":40,
-    "Paraguay":41,
-    "Scotland":42,
-    "Tunisia":45,
-    "DR Congo":46,
-    "Congo DR":46,
-    "Democratic Republic of the Congo":46,
-    "Uzbekistan":50,
-    "Qatar":56,
-    "Iraq":57,
-    "South Africa":60,
-    "Saudi Arabia":61,
-    "Jordan":63,
-    "Bosnia and Herzegovina":64,
-    "Bosnia & Herzegovina":64,
-    "Bosnia-Herzegovina":64,
-    "Bosnia &amp; Herzegovina":64,
-    "Cape Verde":67,
-    "Cabo Verde":67,
-    "Ghana":73,
-    "Curaçao":82,
-    "Curacao":82,
-    "Haiti":83,
-    "New Zealand":85
-  };
+  const FIFA_RANK={
+  "Argentina": 1,
+  "Spain": 2,
+  "France": 3,
+  "England": 4,
+  "Portugal": 5,
+  "Brazil": 6,
+  "Morocco": 7,
+  "Netherlands": 8,
+  "Belgium": 9,
+  "Germany": 10,
+  "Croatia": 11,
+  "Colombia": 13,
+  "Mexico": 14,
+  "Senegal": 15,
+  "Uruguay": 16,
+  "USA": 17,
+  "United States": 17,
+  "United States of America": 17,
+  "Japan": 18,
+  "Switzerland": 19,
+  "Iran": 20,
+  "IR Iran": 20,
+  "Turkey": 22,
+  "Türkiye": 22,
+  "Turkiye": 22,
+  "Ecuador": 23,
+  "Austria": 24,
+  "South Korea": 25,
+  "Korea Republic": 25,
+  "Australia": 27,
+  "Algeria": 28,
+  "Egypt": 29,
+  "Canada": 30,
+  "Norway": 31,
+  "Ivory Coast": 33,
+  "Côte d'Ivoire": 33,
+  "Cote d'Ivoire": 33,
+  "Panama": 34,
+  "Sweden": 38,
+  "Czechia": 40,
+  "Czech Republic": 40,
+  "Paraguay": 41,
+  "Scotland": 42,
+  "Tunisia": 45,
+  "DR Congo": 46,
+  "Congo DR": 46,
+  "Democratic Republic of the Congo": 46,
+  "Uzbekistan": 50,
+  "Qatar": 56,
+  "Iraq": 57,
+  "South Africa": 60,
+  "Saudi Arabia": 61,
+  "Jordan": 63,
+  "Bosnia and Herzegovina": 64,
+  "Bosnia & Herzegovina": 64,
+  "Bosnia-Herzegovina": 64,
+  "Bosnia &amp; Herzegovina": 64,
+  "Cape Verde": 67,
+  "Cabo Verde": 67,
+  "Ghana": 73,
+  "Curaçao": 82,
+  "Curacao": 82,
+  "Haiti": 83,
+  "New Zealand": 85
+};
+  const STYLE="\n<style id=\"tournament-board-style\">\n  .ko-display-switch{display:flex;gap:6px;margin:0 0 14px}\n  .ko-display-switch button{font:inherit;font-size:12.5px;font-weight:750;border:1px solid var(--line);background:var(--surface);color:var(--soft);padding:7px 12px;border-radius:8px;cursor:pointer}\n  .ko-display-switch button.is-active{background:var(--ink);border-color:var(--ink);color:#fff}\n  .ko-display-switch button:focus-visible{outline:2px solid var(--green);outline-offset:2px}\n  .tournament-board{margin:0 0 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow);overflow:hidden}\n  .tournament-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:14px}\n  .tournament-grid{display:grid;grid-template-columns:repeat(5,220px);gap:22px;min-width:1188px}\n  .tournament-round{display:grid;grid-template-rows:24px repeat(32,32px);row-gap:8px;align-items:stretch}\n  .tournament-round h3{grid-row:1;margin:0;text-align:center;color:var(--green);font-size:11px;font-weight:850;letter-spacing:.02em;line-height:24px}\n  .tournament-card{grid-column:1;grid-row:var(--row) / span 2;position:relative;min-height:72px;border:1px solid var(--line);border-radius:9px;background:var(--surface);box-shadow:0 1px 2px rgba(20,24,28,.04);overflow:hidden}\n  .tournament-card.is-final{border-color:var(--green-line);box-shadow:0 1px 2px rgba(20,24,28,.04),0 0 0 2px var(--green-soft)}\n  .tournament-meta{display:flex;justify-content:space-between;gap:7px;padding:5px 8px 4px;border-bottom:1px solid var(--line2);background:#FCFBF8;color:var(--faint);font-size:9.5px;font-weight:750;white-space:nowrap}\n  .tournament-team{display:flex;align-items:center;gap:7px;min-width:0;padding:4px 8px;color:var(--ink);font-size:11.5px;font-weight:650;line-height:1.15}\n  .tournament-team+.tournament-team{border-top:1px solid var(--line2)}\n  .tournament-team .t-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n  .tournament-team .t-score{min-width:14px;text-align:right;font-size:13px;font-weight:850}\n  .tournament-team.is-winner{font-weight:850;background:var(--green-soft)}\n  .tournament-team.is-placeholder{color:var(--faint);font-size:10.5px;font-weight:550}\n  .tournament-third{margin:0 0 16px;max-width:360px}\n  .tournament-third h3{margin:0 0 7px;color:var(--green);font-size:12px;font-weight:850}\n  .tournament-third .tournament-card{min-height:unset;position:static;display:block}\n  .tournament-third .tournament-meta{border-radius:8px 8px 0 0}\n  .ko-list-section[hidden]{display:none!important}\n  @media (max-width:560px){.tournament-scroll{padding:12px}.tournament-grid{gap:18px}.ko-display-switch{margin-bottom:12px}}\n</style>";
+  const THIRD_STYLE="<style id=\"third-qualifier-style\">\n  table.st tr.adv3 td{background:var(--amber-soft)}\n  table.st tr.adv3 td.team{box-shadow:inset 3px 0 0 var(--amber)}\n  table.st tr.adv3 .rk{color:var(--amber)}\n  .legend .dot.third{background:var(--amber)}\n</style>";
+  const THIRD_PATCH="<script id=\"third-qualifier-patch\">\n(function(){\n  function isPlaceholderTeam(row){ return !row || !!row.ph; }\n  function groupNames(){\n    return Array.from(new Set((Array.isArray(DATA)?DATA:[]).filter(function(m){return m.group;}).map(function(m){return m.group;})));\n  }\n  function groupRows(){\n    if(typeof standings!==\"function\") return [];\n    return groupNames().map(function(group){ return {group:group,rows:standings(group)}; });\n  }\n  function bracketThirdTeams(groups){\n    var positionByTeam=new Map();\n    groups.forEach(function(entry){\n      entry.rows.forEach(function(row,index){ positionByTeam.set(row.team,index+1); });\n    });\n    var teams=new Set();\n    (Array.isArray(DATA)?DATA:[]).filter(function(match){return match.round===\"Round of 32\";}).forEach(function(match){\n      [match.team1,match.team2].forEach(function(team){ if(positionByTeam.get(team)===3) teams.add(team); });\n    });\n    return teams.size===8 ? teams : null;\n  }\n  function provisionalThirdTeams(groups){\n    var candidates=groups.map(function(entry){ return entry.rows && entry.rows.length>2 ? entry.rows[2] : null; })\n      .filter(function(row){ return row && !isPlaceholderTeam(row); });\n    candidates.sort(function(a,b){\n      return (b.Pts-a.Pts) || (b.GD-a.GD) || (b.GF-a.GF) || String(a.team).localeCompare(String(b.team));\n    });\n    return new Set(candidates.slice(0,8).map(function(row){ return row.team; }));\n  }\n  function renderGroupsWithThirdQualifiers(){\n    var box=document.getElementById(\"v-groups\");\n    if(!box || typeof el!==\"function\" || typeof standings!==\"function\") return;\n    box.innerHTML=\"\";\n\n    var grid=el(\"div\",\"grid\");\n    var groups=groupRows();\n    var confirmed=bracketThirdTeams(groups);\n    var thirds=confirmed || provisionalThirdTeams(groups);\n    var thirdLabel=confirmed ? \"3位突破（上位8チーム）\" : \"3位突破圏（上位8チーム）\";\n\n    groups.forEach(function(entry){\n      var group=entry.group;\n      var rows=entry.rows;\n      var card=el(\"div\",\"card\");\n      var heading=el(\"h3\");\n      var letter=String(group).replace(\"Group \",\"\");\n      heading.appendChild(Object.assign(el(\"span\",\"gchip\"),{textContent:letter}));\n      heading.appendChild(document.createTextNode(typeof groupJa===\"function\"?groupJa(group):group));\n      card.appendChild(heading);\n\n      var table=el(\"table\",\"st\");\n      table.innerHTML='<thead><tr><th style=\"text-align:left\">チーム</th><th>試</th><th>勝</th><th>分</th><th>敗</th><th>得失</th><th>点</th></tr></thead>';\n      var body=el(\"tbody\");\n\n      rows.forEach(function(row,index){\n        var tr=el(\"tr\");\n        var advancesTopTwo=index<2 && !isPlaceholderTeam(row);\n        var advancesAsThird=index===2 && !isPlaceholderTeam(row) && thirds.has(row.team);\n        if(advancesTopTwo) tr.className=\"adv\";\n        else if(advancesAsThird) tr.className=\"adv3\";\n\n        var gd=(row.GD>0?\"+\":\"\")+row.GD;\n        var teamCell=el(\"td\",\"team\"+(row.ph?\" ph\":\"\"));\n        var label=typeof teamJa===\"function\"?teamJa(row.team):row.team;\n        teamCell.innerHTML='<span class=\"rk\">'+(index+1)+\"</span>\"+(typeof escapeHtml===\"function\"?escapeHtml(label):String(label));\n        tr.appendChild(teamCell);\n        [row.P,row.W,row.D,row.L,gd].forEach(function(value){tr.appendChild(Object.assign(el(\"td\"),{textContent:value}));});\n        tr.appendChild(Object.assign(el(\"td\",\"pts\"),{textContent:row.Pts}));\n        body.appendChild(tr);\n      });\n\n      table.appendChild(body);\n      card.appendChild(table);\n      var legend=el(\"div\",\"legend\");\n      legend.innerHTML='<span class=\"dot\"></span>各組1・2位が決勝トーナメント進出　<span class=\"dot third\"></span>'+thirdLabel;\n      card.appendChild(legend);\n      grid.appendChild(card);\n    });\n    box.appendChild(grid);\n  }\n\n  window.renderGroups=renderGroupsWithThirdQualifiers;\n  renderGroupsWithThirdQualifiers();\n})();\n<\/script>";
+  const PATCH="\n<script id=\"tournament-board-patch\">\n(function(){\n  function setupTournamentBoard(){\n    var view=document.getElementById('v-ko');\n    var list=document.getElementById('koList');\n    var sort=document.getElementById('koSort');\n    if(!view || !list || !sort || typeof DATA==='undefined') return;\n    if(document.getElementById('tournamentBoard')) return;\n\n    var listSection=document.createElement('div');\n    listSection.className='ko-list-section';\n    listSection.id='koListSection';\n    var sortbar=sort.parentNode;\n    view.insertBefore(listSection,sortbar);\n    listSection.appendChild(sortbar);\n    listSection.appendChild(list);\n\n    var sw=document.createElement('div');\n    sw.className='ko-display-switch';\n    sw.setAttribute('role','tablist');\n    sw.setAttribute('aria-label','決勝トーナメントの表示切替');\n    sw.innerHTML='<button type=\"button\" class=\"is-active\" data-mode=\"board\">トーナメント表</button><button type=\"button\" data-mode=\"list\">試合一覧</button>';\n\n    var board=document.createElement('div');\n    board.id='tournamentBoard';\n    view.insertBefore(sw,view.firstChild);\n    view.insertBefore(board,sw.nextSibling);\n\n    function esc(value){return String(value==null?'':value).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c];});}\n    function nOf(m){return m && m.num!=null ? Number(m.num) : null;}\n    function dateOf(m){try{return typeof koDate==='function'?koDate(m):null;}catch(e){return null;}}\n    function dateText(m){var d=dateOf(m);if(!d || isNaN(d.getTime()))return m.time||'未定';return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}\n    function scoreOf(m){try{var s=typeof ft==='function'?ft(m):null;return Array.isArray(s)&&s.length===2?s:null;}catch(e){return null;}}\n    function labelOf(v){try{return typeof teamJa==='function'?teamJa(v):String(v||'未定');}catch(e){return String(v||'未定');}}\n    function isPlaceholder(v){return /^[WL]\\d+$/.test(String(v||'')) || /^\\d[A-L](?:\\/.*)?$/.test(String(v||''));}\n    function refs(m){return [m.team1,m.team2].map(function(v){var x=/^[WL](\\d+)$/.exec(String(v||''));return x?Number(x[1]):null;}).filter(function(v){return v!==null;});}\n    function card(m,row,finalCard){\n      var score=scoreOf(m), n=nOf(m), a=labelOf(m.team1), b=labelOf(m.team2);\n      function team(name,raw,points,win){return '<div class=\"tournament-team'+(isPlaceholder(raw)?' is-placeholder':'')+(win?' is-winner':'')+'\"><span class=\"t-name\">'+esc(name)+'</span><span class=\"t-score\">'+(points==null?'':esc(points))+'</span></div>';}\n      return '<article class=\"tournament-card'+(finalCard?' is-final':'')+'\" style=\"--row:'+row+'\"><div class=\"tournament-meta\"><span>'+(n===null?'決勝':'M'+n)+'</span><span>'+esc(dateText(m))+'</span></div>'+team(a,m.team1,score?score[0]:null,score&&score[0]>score[1])+team(b,m.team2,score?score[1]:null,score&&score[1]>score[0])+'</article>';\n    }\n    function buildBoard(){\n      var all=Array.isArray(DATA)?DATA:[];\n      var byNum=new Map();all.forEach(function(m){var n=nOf(m);if(n!==null)byNum.set(n,m);});\n      var stages=[\n        {key:'Round of 32',title:'ラウンド32'},\n        {key:'Round of 16',title:'ラウンド16'},\n        {key:'Quarter-final',title:'準々決勝'},\n        {key:'Semi-final',title:'準決勝'},\n        {key:'Final',title:'決勝'}\n      ];\n      var groups={};stages.forEach(function(s){groups[s.key]=all.filter(function(m){return m.round===s.key;});});\n      var finalMatch=groups.Final[0];\n      if(!finalMatch){board.innerHTML='<div class=\"tournament-board\"><div class=\"tournament-scroll\">決勝トーナメントの日程を読み込めませんでした。</div></div>';return;}\n\n      var leaf=[],seenLeaf=new Set();\n      function collect(m,seen){\n        if(!m || seen.has(m))return;seen.add(m);\n        var rs=refs(m);\n        if(!rs.length){var n=nOf(m);if(n!==null && !seenLeaf.has(n)){seenLeaf.add(n);leaf.push(n);}return;}\n        rs.forEach(function(n){collect(byNum.get(n),seen);});\n      }\n      collect(finalMatch,new Set());\n      (groups['Round of 32']||[]).forEach(function(m){var n=nOf(m);if(n!==null&&!seenLeaf.has(n)){seenLeaf.add(n);leaf.push(n);}});\n      var leafIndex=new Map();leaf.forEach(function(n,i){leafIndex.set(n,i);});\n\n      var slot=new Map();\n      (groups['Round of 32']||[]).sort(function(a,b){return leafIndex.get(nOf(a))-leafIndex.get(nOf(b));}).forEach(function(m,i){slot.set(nOf(m),i);});\n      stages.slice(1).forEach(function(stage){\n        (groups[stage.key]||[]).forEach(function(m,i){\n          var parents=refs(m).map(function(n){return slot.get(n);}).filter(function(v){return typeof v==='number';});\n          slot.set(nOf(m),parents.length?parents.reduce(function(a,b){return a+b;},0)/parents.length:i);\n        });\n      });\n\n      var out='<div class=\"tournament-board\"><div class=\"tournament-scroll\"><div class=\"tournament-grid\">';\n      stages.forEach(function(stage){\n        var matches=(groups[stage.key]||[]).slice().sort(function(a,b){return (slot.get(nOf(a))||0)-(slot.get(nOf(b))||0);});\n        out+='<section class=\"tournament-round\"><h3>'+stage.title+'</h3>';\n        matches.forEach(function(m){var pos=slot.get(nOf(m));if(typeof pos!=='number')pos=7.5;var row=Math.max(2,Math.min(32,Math.round(2+2*pos)));out+=card(m,row,stage.key==='Final');});\n        out+='</section>';\n      });\n      out+='</div></div></div>';\n      var third=all.find(function(m){return m.round==='Match for third place';});\n      if(third){out+='<div class=\"tournament-third\"><h3>3位決定戦</h3>'+card(third,1,false)+'</div>';}\n      board.innerHTML=out;\n    }\n\n    function setMode(mode){\n      var boardMode=mode==='board';\n      board.hidden=!boardMode;\n      listSection.hidden=boardMode;\n      sw.querySelectorAll('button').forEach(function(b){b.classList.toggle('is-active',b.getAttribute('data-mode')===mode);});\n    }\n    sw.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){setMode(b.getAttribute('data-mode'));});});\n\n    var originalRender=window.renderKO;\n    if(typeof originalRender==='function'){\n      window.renderKO=function(){originalRender();buildBoard();};\n    }\n    buildBoard();\n    setMode('board');\n  }\n  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupTournamentBoard,{once:true});\n  else setupTournamentBoard();\n})();\n<\/script>";
   try{
     const res=await fetch(SOURCE_URL,{cache:'no-store'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok)throw new Error('HTTP '+res.status);
     const source=await res.text();
-    const replacement='const FIFA_RANK = '+JSON.stringify(FIFA_RANK,null,2)+';';
-    const updated=source.replace(/const FIFA_RANK = \{[\s\S]*?\n\};/,replacement);
-    if(updated===source) throw new Error('FIFA_RANK block was not found.');
+    const rankText='const FIFA_RANK = '+JSON.stringify(FIFA_RANK,null,2)+';';
+    let updated=source.replace(/const FIFA_RANK = \{[\s\S]*?\n\};/,rankText);
+    updated=updated.replace(/<\/head>/i,STYLE+THIRD_STYLE+'\n</head>');
+    updated=updated.replace(/<\/body>/i,PATCH+THIRD_PATCH+'\n</body>');
+    if(updated===source)throw new Error('更新対象を見つけられませんでした。');
     document.open();
     document.write(updated);
     document.close();
